@@ -3,12 +3,15 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"code.google.com/p/gcfg"
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
+	"strings"
 )
 
 func main() {
@@ -26,8 +29,18 @@ func main() {
 		fmt.Printf("error: %v", err)
 		return
 	}
-	fmt.Print(v.Responses[0].Propstat.Prop.Adress)
-	fmt.Print(v.Responses[1].Propstat.Prop.Adress)
+	dada := v.Responses[1].Propstat.Prop.Adress
+	dadaReader := strings.NewReader(dada)
+	scanner := bufio.NewScanner(dadaReader)
+	for scanner.Scan() {
+		fmt.Println(scanner.Text()) // Println will add back the final '\n'
+		//scanner.Text()
+	}
+	if err := scanner.Err(); err != nil {
+		fmt.Fprintln(os.Stderr, "reading standard input:", err)
+	}
+}
+func analyseVcard(s string) {
 
 }
 
