@@ -19,11 +19,20 @@ type Config struct {
 	}
 }
 
-type Start1 struct {
-	MultiStatus1 MultiStatus1 `xml:"multistatus"`
+type Prop struct {
+	Status string `xml:"status"`
 }
-type MultiStatus1 struct {
-	Hallo string `xml:"hallo"`
+type Propstat struct {
+	Prop Prop `xml:"prop"`
+}
+
+type Response struct {
+	Href     string   `xml:"href"`
+	Propstat Propstat `xml:"propstat"`
+}
+type Result struct {
+	XMLName   xml.Name `xml:"multistatus"`
+	Responses Response `xml:"response"`
 }
 
 func getAddressBook(cfg Config) []byte {
@@ -64,18 +73,30 @@ func main() {
 		fmt.Printf("error: %v", err)
 		return
 	}
-	dada := getAddressBook(cfg)
-	fmt.Println(string(dada))
-	str1 := `<multistatus>
-	<hallo>geht was</hallo>
-</multistatus>`
-	fmt.Println(str1)
-	v := Start1{}
-	err = xml.Unmarshal([]byte(str1), &v)
+	//dada := getAddressBook(cfg)
+
+	data1 := `<?xml version="1.0" encoding="utf-8"?>
+<d:multistatus xmlns:card="urn:ietf:params:xml:ns:carddav" xmlns:d="DAV:" xmlns:s="http://sabredav.org/ns">
+	<d:response>
+		<d:href>/remote.php/carddav/addressbooks/test/kontakte/cd28ea0d-83e1-45c0-8ce2-d29dfa3bf9b9%40cloud.tkschmidt.me.vcf</d:href>
+		<d:propstat>
+			<d:prop>
+			<d:status>HTTP/1.1 200 OK</d:status>
+			</d:prop>
+		</d:propstat>
+	</d:response>
+</d:multistatus>`
+
+	v := Result{}
+	//err = xml.Unmarshal(data1, &v)
+	err = xml.Unmarshal([]byte(data1), &v)
+
 	if err != nil {
 		fmt.Printf("error: %v", err)
 		return
 	}
-	v.MultiStatus1.Hallo = "test"
-	fmt.Println(v)
+	fmt.Println("##########################")
+	//	fmt.Printf("XMLName: %#v\n", v.XMLName)
+	fmt.Printf("%#v\n", v)
+	fmt.Printf("%#q\n", v)
 }
