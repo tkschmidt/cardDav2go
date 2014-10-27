@@ -20,10 +20,12 @@ type Config struct {
 }
 
 type Prop struct {
-	Status string `xml:"status"`
+	Etag   string `xml:"getetag"`
+	Adress string `xml:"address-data"`
 }
 type Propstat struct {
-	Prop Prop `xml:"prop"`
+	Prop   Prop   `xml:"prop"`
+	Status string `xml:"status"`
 }
 
 type Response struct {
@@ -31,8 +33,8 @@ type Response struct {
 	Propstat Propstat `xml:"propstat"`
 }
 type Result struct {
-	XMLName   xml.Name `xml:"multistatus"`
-	Responses Response `xml:"response"`
+	XMLName   xml.Name   `xml:"multistatus"`
+	Responses []Response `xml:"response"`
 }
 
 func getAddressBook(cfg Config) []byte {
@@ -73,30 +75,13 @@ func main() {
 		fmt.Printf("error: %v", err)
 		return
 	}
-	//dada := getAddressBook(cfg)
-
-	data1 := `<?xml version="1.0" encoding="utf-8"?>
-<d:multistatus xmlns:card="urn:ietf:params:xml:ns:carddav" xmlns:d="DAV:" xmlns:s="http://sabredav.org/ns">
-	<d:response>
-		<d:href>/remote.php/carddav/addressbooks/test/kontakte/cd28ea0d-83e1-45c0-8ce2-d29dfa3bf9b9%40cloud.tkschmidt.me.vcf</d:href>
-		<d:propstat>
-			<d:prop>
-			<d:status>HTTP/1.1 200 OK</d:status>
-			</d:prop>
-		</d:propstat>
-	</d:response>
-</d:multistatus>`
-
+	cAb := getAddressBook(cfg)
 	v := Result{}
-	//err = xml.Unmarshal(data1, &v)
-	err = xml.Unmarshal([]byte(data1), &v)
-
+	err = xml.Unmarshal(cAb, &v)
 	if err != nil {
 		fmt.Printf("error: %v", err)
 		return
 	}
-	fmt.Println("##########################")
-	//	fmt.Printf("XMLName: %#v\n", v.XMLName)
-	fmt.Printf("%#v\n", v)
-	fmt.Printf("%#q\n", v)
+	//fmt.Printf("%#q\n", v)
+	fmt.Print(v.Responses[0].Propstat.Prop.Adress)
 }
