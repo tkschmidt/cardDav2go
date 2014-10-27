@@ -11,6 +11,26 @@ import (
 	"net/http"
 )
 
+func main() {
+	var cfg Config
+	err := gcfg.ReadFileInto(&cfg, "myconfig.cfg")
+	if err != nil {
+		fmt.Println("hallo")
+		fmt.Printf("error: %v", err)
+		return
+	}
+	cAb := getAddressBook(cfg)
+	v := Result{}
+	err = xml.Unmarshal(cAb, &v)
+	if err != nil {
+		fmt.Printf("error: %v", err)
+		return
+	}
+	fmt.Print(v.Responses[0].Propstat.Prop.Adress)
+	fmt.Print(v.Responses[1].Propstat.Prop.Adress)
+
+}
+
 type Config struct {
 	Setting struct {
 		Url  string
@@ -65,23 +85,4 @@ func getAddressBook(cfg Config) []byte {
 	//	fmt.Println("response Body:", string(body))
 	// fmt.Println(string(body))
 	return body
-}
-
-func main() {
-	var cfg Config
-	err := gcfg.ReadFileInto(&cfg, "myconfig.cfg")
-	if err != nil {
-		fmt.Println("hallo")
-		fmt.Printf("error: %v", err)
-		return
-	}
-	cAb := getAddressBook(cfg)
-	v := Result{}
-	err = xml.Unmarshal(cAb, &v)
-	if err != nil {
-		fmt.Printf("error: %v", err)
-		return
-	}
-	//fmt.Printf("%#q\n", v)
-	fmt.Print(v.Responses[0].Propstat.Prop.Adress)
 }
